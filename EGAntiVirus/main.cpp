@@ -28,7 +28,6 @@ wxString dbFile4;  //For Update days to upddate
 wxString dbFile5;  //For machineID	
 wxString dbFile6;  //For monitor a Folder
 
-
 bool gbValidateProduct;
 
 bool MyApp::OnInit()
