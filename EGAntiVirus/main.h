@@ -14,7 +14,6 @@ public:
 
 };
 
-
 void ConfigClamD(const wxString& WorkingDir, const wxString& AppDataDir);
 
 void makeDefaultMonitoringFolderList(const wxString& dbFileFullPath);
