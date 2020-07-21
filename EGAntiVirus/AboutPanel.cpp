@@ -94,7 +94,7 @@ AboutPanel::AboutPanel(const wxString& title, wxWindow* parent) :wxPanel(parent,
 
 
 	m_st_SE_Text = new wxStaticText(m_pMid1Bitmap, -1, wxT("Powered by:"));
-	m_st_SE_Text->SetForegroundColour(EGAV_TEXT_COLOR_WHITE);
+	m_st_SE_Text->SetForegroundColour(wxColor(100,100,100));
 	m_st_SE_Text->SetFont(wxFont(11, wxFONTFAMILY_SWISS, wxFONTSTYLE_NORMAL, wxFONTWEIGHT_NORMAL));
 	m_bb_clam_av = new wxBitmapButton(m_pMid1Bitmap, ID_BITMAP_BUTTON_CLAMAV, clamIcon, wxDefaultPosition, wxDefaultSize, EGAV_BUTTON_STYLE_NOBORDER);
 	m_bb_clam_av->SetCursor(wxCursor(wxCURSOR_HAND));
@@ -111,7 +111,7 @@ AboutPanel::AboutPanel(const wxString& title, wxWindow* parent) :wxPanel(parent,
 
 
 	m_st_LU_Text = new wxStaticText(m_pMid2Bitmap, -1, wxT("GUI by:"));
-	m_st_LU_Text->SetForegroundColour(EGAV_TEXT_COLOR_WHITE);
+	m_st_LU_Text->SetForegroundColour(wxColor(100, 100, 100));
 	m_st_LU_Text->SetFont(wxFont(11, wxFONTFAMILY_SWISS, wxFONTSTYLE_NORMAL, wxFONTWEIGHT_NORMAL));
 
 	m_bb_wxwidjets = new wxBitmapButton(m_pMid2Bitmap, ID_BITMAP_BUTTON_WXWIDJETS, wxwidjetIcon, wxDefaultPosition, wxDefaultSize, EGAV_BUTTON_STYLE_NOBORDER);

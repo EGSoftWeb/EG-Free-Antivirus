@@ -81,8 +81,7 @@ void WaitForCleaning::OnWaitCleaningTimer(wxTimerEvent& tmrEvent)
 
 void WaitForCleaning::OnBtnOk(wxCommandEvent& event)
 {
-	for(int i=0;i<10;i++)
-		gSizeVal[i]=0;
+	gSizeVal[10] = { 0 };
 	TotalSizeFreed = 0;
 	gStrReportingForCleaning.Clear();
 	event.Skip();

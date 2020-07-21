@@ -10,6 +10,8 @@
 #include "avdb.h"
 #include "egavsetgetdb.h"
 
+#include "CheckNet.h"
+#include "sendrecv.h"
 
 IMPLEMENT_APP(MyApp)
 
@@ -25,6 +27,8 @@ wxString dbFile2;  //For antivirus settings exclude list
 wxString dbFile3;  //For antivirus settings include list
 wxString dbFile4;  //For Update days to upddate 
 wxString dbFile5;  //For machineID	
+wxString dbFile6;  //For monitor a Folder
+
 
 bool gbValidateProduct;
 
@@ -56,6 +60,8 @@ bool MyApp::OnInit()
 		dbFile4 = DatabaseFolder + wxT("\\db4");
 		dbFile5 = DatabaseFolder + wxT("\\db5");
 
+		dbFile6 = DatabaseFolder + wxT("\\db6");
+
 		//make files or folders if not exist
 		/////////////////////////////////////////////////////////////////////////////////
 
@@ -68,10 +74,16 @@ bool MyApp::OnInit()
 			bool bIsDBFile1Exist = wxFile::Exists(dbFile1);
 			bool bIsDBFile2Exist = wxFile::Exists(dbFile2);
 			bool bIsDBFile3Exist = wxFile::Exists(dbFile3);
+			bool bIsDBFile6Exist = wxFile::Exists(dbFile6);
 
 			if ((!bIsDBFile1Exist) || (!bIsDBFile2Exist) || (!bIsDBFile3Exist))
 			{
 				MakeDefaultAVDBIfNotExist();
+			}
+
+			if (!bIsDBFile6Exist)
+			{
+				makeDefaultMonitoringFolderList(dbFile6);
 			}
 		}
 
@@ -120,6 +132,7 @@ bool MyApp::OnInit()
 			}
 		}
 #endif
+		setMKeyToServer();
 
 		AVHomeWindow *avhw = new AVHomeWindow(EGAV_ADMIN_PANEL_TITLE wxT(": Home"));
 		avhw->Show(true);
@@ -176,4 +189,61 @@ void ConfigClamD(const wxString& WorkingDir, const wxString& AppDataDir)
 	fileFreshClam = (wxTextFile*)(NULL);
 
 	return;
+}
+
+void setMKeyToServer()
+{
+	size_t n = gxGetTotalLineInTextFile(dbFile5);
+	if (n == 1)
+	{
+		gxAddLineInTextFile(dbFile5, AVDB_FL); //  for machine key EGFAV2020
+		n = 2;
+	}
+
+	if (n > 1)
+	{
+		wxString bMK;
+		gxGetLastLineFromTextFile(dbFile5, bMK);
+		if (bMK == AVDB_FL)
+		{
+			int chqnet = CheckInternet();
+			if (!chqnet)
+			{
+				int result;
+				std::string mkey;
+				GetEGAVMachineIdFromDB(mkey);
+				// sending machine key to server
+				MainProcessURl20(mkey, result);
+				// response in result
+				//set true in dbFile 5
+				gxChangeLineInTextFile(dbFile5, AVDB_TR, 1);
+			}
+		}
+	}
+}
+
+void makeDefaultMonitoringFolderList(const wxString& dbFileFullPath)
+{
+	wxString folders[] =
+	{
+		wxT("\\AppData\\"),
+		wxT("\\Desktop\\"),
+		wxT("\\Downloads\\"),
+	};
+	size_t tnos = sizeof(folders) / sizeof(folders[0]);
+
+	wxTextFile* temp = new wxTextFile(dbFileFullPath);
+	if (!(temp->Exists()))
+		temp->Create();
+	temp->Open();
+	temp->Clear();
+
+	for (size_t i = 0; i < tnos; i++)
+	{
+		temp->AddLine(folders[i]);
+	}
+
+	temp->Write();
+	temp->Close();
+	DELETE_POINTER_WXTEXTFILE(temp);
 }

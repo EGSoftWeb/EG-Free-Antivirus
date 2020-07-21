@@ -29,6 +29,7 @@ public:
 	void OnCheckBox2(wxCommandEvent& event);	//Event function for Option "Extract Files From Archives"
 	void OnCheckBox3(wxCommandEvent& event);	//Event function for Option "Automatic Updates On/Off"
 	void OnCheckBox4(wxCommandEvent& event);	//Event function for Option "Real-Time Protection On/Off"
+	void OnCheckBox5(wxCommandEvent& event);    //Event function for Option "Do Not Reload Virus Signature DB (Fast Scan)
 
 	void OnSpinCtrl1(wxCommandEvent& event);	//Event function for Option "Do Not Scan Files Larger Than"MB
 	void OnSpinCtrl2(wxCommandEvent& event);	//Event function for Option	"Do Not Extract More Than"MB
@@ -87,6 +88,8 @@ public:
 	wxCheckBox* cb_2;
 	wxCheckBox* cb_3;
 	wxCheckBox* cb_4;
+	
+	wxCheckBox* cb_5;
 
 
 	wxSpinCtrl* sc_1;
@@ -121,7 +124,7 @@ public:
 	wxListBox* list1;	//Exclude list box
 	wxListBox* list2;	//Include list box
 
-	bool m_rb1, m_rb2, m_rb3, m_cb1, m_cb2, m_cb3, m_cb4;
+	bool m_rb1, m_rb2, m_rb3, m_cb1, m_cb2, m_cb3, m_cb4, m_cb5;
 	unsigned long m_sc1, m_sc2, m_sc3, m_sc4;// m_sc5;
 
 };
@@ -143,6 +146,7 @@ enum eBTN_ID9
 	ID_SETTINGS_CB2,
 	ID_SETTINGS_CB3,
 	ID_SETTINGS_CB4,
+	ID_SETTINGS_CB5,
 
 	ID_SETTINGS_SC1,
 	ID_SETTINGS_SC2,

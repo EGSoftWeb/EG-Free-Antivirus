@@ -27,6 +27,7 @@ settingsEGAV::settingsEGAV(const wxString& title) :wxDialog(NULL, -1, title, wxD
 	Connect(ID_SETTINGS_CB2, wxEVT_COMMAND_CHECKBOX_CLICKED, wxCommandEventHandler(settingsEGAV::OnCheckBox2));
 	Connect(ID_SETTINGS_CB3, wxEVT_COMMAND_CHECKBOX_CLICKED, wxCommandEventHandler(settingsEGAV::OnCheckBox3));
 	Connect(ID_SETTINGS_CB4, wxEVT_COMMAND_CHECKBOX_CLICKED, wxCommandEventHandler(settingsEGAV::OnCheckBox4));
+	Connect(ID_SETTINGS_CB5, wxEVT_COMMAND_CHECKBOX_CLICKED, wxCommandEventHandler(settingsEGAV::OnCheckBox5));
 
 	Connect(ID_SETTINGS_RB1, wxEVT_COMMAND_RADIOBUTTON_SELECTED, wxCommandEventHandler(settingsEGAV::OnRadioButton1));
 	Connect(ID_SETTINGS_RB2, wxEVT_COMMAND_RADIOBUTTON_SELECTED, wxCommandEventHandler(settingsEGAV::OnRadioButton2));
@@ -51,16 +52,16 @@ settingsEGAV::settingsEGAV(const wxString& title) :wxDialog(NULL, -1, title, wxD
 
 	panel_ALL = new wxPanel(this, -1, wxPoint(5, 5), wxSize(795, 525));
 	panel_1 = new wxPanel(panel_ALL, -1, wxPoint(8, 14), wxSize(386, 148));
-	panel_2 = new wxPanel(panel_ALL, -1, wxPoint(8, 170), wxSize(386, 70));
-	panel_3 = new wxPanel(panel_ALL, -1, wxPoint(8, 245), wxSize(386, 170));
+	panel_2 = new wxPanel(panel_ALL, -1, wxPoint(8, 170), wxSize(386, 90));
+	panel_3 = new wxPanel(panel_ALL, -1, wxPoint(8, 265), wxSize(386, 150));
 	panel_4 = new wxPanel(panel_ALL, -1, wxPoint(398, 14), wxSize(420, 74));
 	panel_5 = new wxPanel(panel_ALL, -1, wxPoint(398, 87), wxSize(420, 74));
 	panel_6 = new wxPanel(panel_ALL, -1, wxPoint(398, 170), wxSize(420, 245));
 	panel_7 = new wxPanel(panel_ALL, -1, wxPoint(8, 425), wxSize(772, 50));
 
 	sb_InfectedFiles = new wxStaticBox(panel_1, -1, wxT("Infected Files"), wxPoint(6,6), wxSize(370, 134));
-	sb_AllFiles = new wxStaticBox(panel_2, -1, wxT("All Files"), wxPoint(6, 8), wxSize(370, 50));
-	sb_Archives = new wxStaticBox(panel_3, -1, wxT("Archive Files"), wxPoint(8, 7), wxSize(370, 156));
+	sb_AllFiles = new wxStaticBox(panel_2, -1, wxT("All Files"), wxPoint(6, 7), wxSize(370, 80));
+	sb_Archives = new wxStaticBox(panel_3, -1, wxT("Archive Files"), wxPoint(6, 8), wxSize(370, 137));
 	sb_Shield = new wxStaticBox(panel_4, -1, wxT("Real-Time Protection"), wxPoint(6,6), wxSize(410, 60));
 	sb_Update = new wxStaticBox(panel_5, -1, wxT("Updates"), wxPoint(6, 6), wxSize(410, 60));
 	sb_Filters = new wxStaticBox(panel_6, -1, wxT("Filters"), wxPoint(6, 6), wxSize(410, 233));
@@ -89,19 +90,22 @@ settingsEGAV::settingsEGAV(const wxString& title) :wxDialog(NULL, -1, title, wxD
 	sc_1 = new wxSpinCtrl(panel_2, ID_SETTINGS_SC1, wxT("100"), wxPoint(225, 30), wxSize(60, 20), 16896L, 1, 5120);
 	st_2 = new wxStaticText(panel_2, -1, wxT("MB"), wxPoint(295, 30), wxDefaultSize);
 
+	cb_5 = new wxCheckBox(panel_2, ID_SETTINGS_CB5, wxT("Do Not Reload Virus Signature DB ( Fast Scan )"), wxPoint(20, 57), wxDefaultSize);
+
+
 	cb_2 = new wxCheckBox(panel_3, ID_SETTINGS_CB2, wxT("Extract Files From Archives"), wxPoint(20, 35));
 
 	st_3 = new wxStaticText(panel_3, -1, wxT("Do Not Extract More Than"), wxPoint(20, 65), wxDefaultSize);
 	sc_2 = new wxSpinCtrl(panel_3, ID_SETTINGS_SC2, wxT("500"), wxPoint(200, 65), wxSize(60, 20), 16896L, 1, 5120);
 	st_4 = new wxStaticText(panel_3, -1, wxT("MB"), wxPoint(270, 65), wxDefaultSize);
 
-	st_5 = new wxStaticText(panel_3, -1, wxT("Do Not Extract More Than"), wxPoint(20, 95), wxDefaultSize);
-	sc_3 = new wxSpinCtrl(panel_3, ID_SETTINGS_SC3, wxT("50"), wxPoint(200, 95), wxSize(60, 20), 16896L, 1, 500);
-	st_6 = new wxStaticText(panel_3, -1, wxT("Files"), wxPoint(270, 95), wxDefaultSize);
+	st_5 = new wxStaticText(panel_3, -1, wxT("Do Not Extract More Than"), wxPoint(20, 90), wxDefaultSize);
+	sc_3 = new wxSpinCtrl(panel_3, ID_SETTINGS_SC3, wxT("50"), wxPoint(200, 90), wxSize(60, 20), 16896L, 1, 500);
+	st_6 = new wxStaticText(panel_3, -1, wxT("Files"), wxPoint(270, 90), wxDefaultSize);
 	
-	st_7 = new wxStaticText(panel_3, -1, wxT("Do Not Extract More Than"), wxPoint(20, 125), wxDefaultSize);
-	sc_4 = new wxSpinCtrl(panel_3, ID_SETTINGS_SC4, wxT("50"), wxPoint(200, 125), wxSize(60, 20), 16896L, 1, 100);
-	st_8 = new wxStaticText(panel_3, -1, wxT("Sub Archives"), wxPoint(270, 125), wxDefaultSize);
+	st_7 = new wxStaticText(panel_3, -1, wxT("Do Not Extract More Than"), wxPoint(20, 115), wxDefaultSize);
+	sc_4 = new wxSpinCtrl(panel_3, ID_SETTINGS_SC4, wxT("50"), wxPoint(200, 115), wxSize(60, 20), 16896L, 1, 100);
+	st_8 = new wxStaticText(panel_3, -1, wxT("Sub Archives"), wxPoint(270, 115), wxDefaultSize);
 
 	//st_9 = new wxStaticText(panel_4, -1, wxT("Limit Log File Size To"), wxPoint(20, 30), wxDefaultSize);
 	//sc_5 = new wxSpinCtrl(panel_4, ID_SETTINGS_SC5, wxT("1"), wxPoint(200, 30), wxSize(60, 20), 16896L, 1, 5);
@@ -152,7 +156,9 @@ settingsEGAV::settingsEGAV(const wxString& title) :wxDialog(NULL, -1, title, wxD
 	cb_2->SetForegroundColour(EGAV_TEXT_COLOR_WHITE);
 	cb_3->SetForegroundColour(EGAV_TEXT_COLOR_WHITE);
 	cb_4->SetForegroundColour(EGAV_TEXT_COLOR_WHITE);
-	
+	cb_5->SetForegroundColour(EGAV_TEXT_COLOR_WHITE);
+
+
 	bs_V1 = new wxBoxSizer(wxVERTICAL);
 	bs_V2 = new wxBoxSizer(wxVERTICAL);
 	bs_V3 = new wxBoxSizer(wxVERTICAL);
@@ -306,6 +312,16 @@ void settingsEGAV::OnChangingSettings(void)
 		//ExecuteCmdUACSilentW(L"sc.exe", L"start \"WinSEGAV AutoConfig\"", L"");
 	}
 	wxExecute(wxT("egavservicerestart.exe"), wxEXEC_ASYNC | wxEXEC_HIDE_CONSOLE);
+	
+	if (m_cb5)
+	{
+		tempfile->AddLine(AVDB_TR);
+	}
+	else
+	{
+		tempfile->AddLine(AVDB_FL);
+	}
+
 	tempfile->Write();
 	tempfile->Close();
 	DELETE_POINTER_WXTEXTFILE(tempfile);
@@ -458,6 +474,20 @@ void settingsEGAV::OnCheckBox4(wxCommandEvent& event)
 	else
 	{
 		m_cb4 = false;
+	}
+}
+
+void settingsEGAV::OnCheckBox5(wxCommandEvent& event)
+{
+	OnChangingAnyControl();
+
+	if (cb_5->GetValue())
+	{
+		m_cb5 = true;
+	}
+	else
+	{
+		m_cb5 = false;
 	}
 }
 
@@ -748,6 +778,19 @@ void settingsEGAV::LoadDBAndInitData(const wxString& filedb1, const wxString& fi
 		cb_3->SetValue(false);
 		m_cb3 = false;
 	}
+
+	temp = tempfile->GetLine(9);
+	if (temp == AVDB_TR)
+	{
+		cb_5->SetValue(true);
+		m_cb5 = true;
+	}
+	else
+	{
+		cb_5->SetValue(false);
+		m_cb5 = false;
+	}
+
 	tempfile->Close();
 	temp.Clear();
 	DELETE_POINTER_WXTEXTFILE(tempfile);

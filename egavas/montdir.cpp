@@ -12,11 +12,11 @@ wxThread *gThreadMonitorDir2 = NULL;
 extern "C" {
 	WINBASEAPI BOOL WINAPI
 		ReadDirectoryChangesW(HANDLE hDirectory,
-		LPVOID lpBuffer, DWORD nBufferLength,
-		BOOL bWatchSubtree, DWORD dwNotifyFilter,
-		LPDWORD lpBytesReturned,
-		LPOVERLAPPED lpOverlapped,
-		LPOVERLAPPED_COMPLETION_ROUTINE lpCompletionRoutine
+			LPVOID lpBuffer, DWORD nBufferLength,
+			BOOL bWatchSubtree, DWORD dwNotifyFilter,
+			LPDWORD lpBytesReturned,
+			LPOVERLAPPED lpOverlapped,
+			LPOVERLAPPED_COMPLETION_ROUTINE lpCompletionRoutine
 		);
 }
 
@@ -98,9 +98,9 @@ void* ThreadMonitorDir1::Entry()
 			TRUE,// flag for monitoring directory or directory tree
 			FILE_NOTIFY_CHANGE_FILE_NAME |
 			FILE_NOTIFY_CHANGE_DIR_NAME |
-			FILE_NOTIFY_CHANGE_SIZE,
+			FILE_NOTIFY_CHANGE_SIZE |
 			//FILE_NOTIFY_CHANGE_LAST_WRITE |
-			//FILE_NOTIFY_CHANGE_LAST_ACCESS |
+			FILE_NOTIFY_CHANGE_LAST_ACCESS,
 			//FILE_NOTIFY_CHANGE_CREATION,
 			&nRet,// number of bytes returned
 			&PollingOverlap,// pointer to structure needed for overlapped I/O
@@ -214,9 +214,9 @@ void* ThreadMonitorDir2::Entry()
 			TRUE,// flag for monitoring directory or directory tree
 			FILE_NOTIFY_CHANGE_FILE_NAME |
 			FILE_NOTIFY_CHANGE_DIR_NAME |
-			FILE_NOTIFY_CHANGE_SIZE,
+			FILE_NOTIFY_CHANGE_SIZE |
 			//FILE_NOTIFY_CHANGE_LAST_WRITE |
-			//FILE_NOTIFY_CHANGE_LAST_ACCESS |
+			FILE_NOTIFY_CHANGE_LAST_ACCESS,
 			//FILE_NOTIFY_CHANGE_CREATION,
 			&nRet,// number of bytes returned
 			&PollingOverlap,// pointer to structure needed for overlapped I/O
@@ -247,7 +247,8 @@ void* ThreadMonitorDir2::Entry()
 			{
 			case FILE_ACTION_ADDED:
 				//printf("\nThe file is added to the directory: [%s] \n", filename);
-				if ((wxStrFileName.Contains("\\AppData\\")) || (wxStrFileName.Contains("\\Desktop\\")) || (wxStrFileName.Contains("\\Downloads\\")))
+				//if ((wxStrFileName.Contains("\\AppData\\")) || (wxStrFileName.Contains("\\Desktop\\")) || (wxStrFileName.Contains("\\Downloads\\")))
+				if (shouldMonitor(wxStrFileName))
 				{
 					if (!GetExCludeOrNot(wxStrFileName))
 					{
@@ -255,6 +256,9 @@ void* ThreadMonitorDir2::Entry()
 						system(cmd.c_str().AsChar());
 					}
 				}
+				break;
+			case FILE_NOTIFY_CHANGE_LAST_ACCESS:
+				SuccessFunctionLogsW(L"File Accessed: ", wxStrFileName);
 				break;
 			}
 			offset += pNotify->NextEntryOffset;
@@ -290,3 +294,29 @@ void DeleteThreadMonitorDir2()
 	}
 }
 
+bool shouldMonitor(const wxString& filepath)
+{
+	bool ret = false;
+	std::wstring AppDataDir;
+	GetAppDataFolderPath(AppDataDir);
+	wxString dbFile6 = wxString(AppDataDir) + wxT("\\EGAntiVirus\\db\\db6");
+
+	wxTextFile* temp = new wxTextFile(dbFile6);
+	if (!(temp->Exists()))
+	{
+		ErrorAppWinLogW(L"Monitoring folder list file not found, please restart antivirus.");
+		return ret;
+	}
+	temp->Open();
+	for (wxString line = temp->GetFirstLine(); !temp->Eof(); line = temp->GetNextLine())
+	{
+		if (filepath.Contains(line))
+		{
+			ret = true;
+			break;
+		}
+	}
+	temp->Close();
+	DELETE_POINTER(wxTextFile, temp);
+	return ret;
+}

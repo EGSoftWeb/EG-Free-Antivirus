@@ -191,14 +191,10 @@ BOOL RunExeFromCurrentUser(const wstring& processPath, const wstring& arguments)
 	SECURITY_ATTRIBUTES Security1;
 	SECURITY_ATTRIBUTES Security2;
 
-	wstring command = L"\"";
-	command = command.append(processPath);
-	command =command.append(L"\"");
-
+	wstring command = L"\"" + processPath + L"\"";
 	if (arguments.length() != 0)
 	{
-		command = command.append(L" ");
-		command = command.append(arguments);
+		command += L" " + arguments;
 	}
 
 	void* lpEnvironment = NULL;

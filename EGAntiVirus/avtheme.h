@@ -1,19 +1,19 @@
 #ifndef EGAV_THEME_HEADER
 #define EGAV_THEME_HEADER 
 
-#define EGAV_TITLE_NAME                          wxT("EG Free AntiVirus")
+#define EGAV_TITLE_NAME                          wxT("EG Free Antivirus")
 #define EGAV_ADMIN_PANEL_TITLE				     wxT("EG Free Antivirus(Administrator)")
 
 #define EGAV_WINDOW_BORDER_STYLE                 wxFRAME_TOOL_WINDOW | wxMINIMIZE_BOX 
 #define EGAV_HOME_WINDOW_BORDER_STYLE            wxCAPTION | wxCLOSE_BOX | wxMINIMIZE_BOX | wxTAB_TRAVERSAL
 #define EGAV_DIALOG_BORDER_STYLE				 wxCAPTION | wxTAB_TRAVERSAL
-#define EGAV_WINDOW_BACK_COLOR1                  wxColor(37,43,55)//wxColor(64,96,138)//wxColor(45, 125, 116)
+#define EGAV_WINDOW_BACK_COLOR1                  wxColor(20,21,24)//wxColor(64,96,138)//wxColor(45, 125, 116)
 #define EGAV_WINDOW_BACK_COLOR2                  wxColor(230, 230, 230)
-#define EGAV_PANEL_BACK_COLOR                    wxColor(51,57,73)
+#define EGAV_PANEL_BACK_COLOR                    wxColor(38,38,38)
 
 #define EGAV_BUTTON_STYLE_NOBORDER               0 | wxBORDER_NONE 
 #define EGAV_BUTTON_BACK_COLOR1                  wxColor(245, 182, 75)
-#define EGAV_BUTTON_BACK_COLOR2                  wxColor(77, 93, 108)//wxColor(176, 198, 195)
+#define EGAV_BUTTON_BACK_COLOR2                  wxColor(97,97,97)//wxColor(77, 93, 108)//wxColor(176, 198, 195)
 #define EGAV_BUTTON_TEXT_COLOR1                  wxColor(200, 236, 234)
 #define EGAV_BUTTON_TEXT_COLOR2                  wxColor(16, 28 , 28)
 #define EGAV_BUTTON_SIZE_BIG                     wxSize(160, 30)

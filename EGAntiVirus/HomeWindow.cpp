@@ -12,7 +12,6 @@
 #include "egavicon.h"
 #include "helpDoc.h"
 
-
 extern wxString workingDir;
 extern bool gbMsgResponse;
 
@@ -41,7 +40,8 @@ AVHomeWindow::AVHomeWindow(const wxString& winTitle)
 
 	Connect(ID_BUTTON_FACEBOOK, wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(AVHomeWindow::OnBunttonFacebook));
 	Connect(ID_BUTTON_TWITTER, wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(AVHomeWindow::OnBunttonTwitter));
-	Connect(ID_BUTTON_GOOGLE, wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(AVHomeWindow::OnBunttonGoogle));
+	//Connect(ID_BUTTON_GOOGLE, wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(AVHomeWindow::OnBunttonGoogle));
+	Connect(ID_BUTTON_INSTAGRAM, wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(AVHomeWindow::OnBunttonInstagram));
 
 
 	// Defining Panels
@@ -102,19 +102,23 @@ AVHomeWindow::AVHomeWindow(const wxString& winTitle)
 	m_avClogo->SetCursor(wxCursor(wxCURSOR_HAND));
 	m_avQuarantineText = new wxClickText(m_avPanel3, ID_QUARANTINETEXT, wxT("Quarantine Folder"), wxPoint(187, 0));
 	m_avQuarantineText->SetCursor(wxCursor(wxCURSOR_HAND));
-	m_avHeadingText = new wxStaticText(m_avPanel2, -1, wxT(" Free AntiVirus"));
+	m_avHeadingText1 = new wxStaticText(m_avPanel2, -1, wxT(" Free"));
+	m_avHeadingText2 = new wxStaticText(m_avPanel2, -1, wxT(" AntiVirus"));
 	m_avClogo->SetFont(wxFont(23, wxFONTFAMILY_SWISS, wxFONTSTYLE_ITALIC, wxFONTWEIGHT_BOLD));
 	m_avQuarantineText->SetFont(wxFont(12, wxFONTFAMILY_SWISS, wxFONTSTYLE_NORMAL, wxFONTWEIGHT_NORMAL, true));
 
 	m_avClogo->SetForegroundColour(wxColor(245, 182, 75));
 	m_avQuarantineText->SetForegroundColour(wxColor(244, 168, 38));
-	m_avHeadingText->SetFont(wxFont(22, wxFONTFAMILY_SWISS, wxFONTSTYLE_ITALIC, wxFONTWEIGHT_NORMAL));
-	m_avHeadingText->SetForegroundColour(wxColor(64, 213, 128));
+	m_avHeadingText1->SetFont(wxFont(22, wxFONTFAMILY_SWISS, wxFONTSTYLE_ITALIC, wxFONTWEIGHT_NORMAL));
+	m_avHeadingText2->SetFont(wxFont(22, wxFONTFAMILY_SWISS, wxFONTSTYLE_ITALIC, wxFONTWEIGHT_NORMAL));
+	m_avHeadingText1->SetForegroundColour(EGAV_TEXT_COLOR_WHITE);
+	m_avHeadingText2->SetForegroundColour(wxColor(64, 213, 128));
 	m_avSizer1H = new wxBoxSizer(wxHORIZONTAL);
 
 	m_avSizer1H->AddSpacer(20);
 	m_avSizer1H->Add(m_avClogo, 1, 0, 0);
-	m_avSizer1H->Add(m_avHeadingText, 0, 0, 0);
+	m_avSizer1H->Add(m_avHeadingText1, 0, 0, 0);
+	m_avSizer1H->Add(m_avHeadingText2, 0, 0, 0);
 
 	m_avPanel2->SetSizer(m_avSizer1H);
 
@@ -176,25 +180,32 @@ AVHomeWindow::AVHomeWindow(const wxString& winTitle)
 	Panel_FTG = new wxPanel(m_avPanel0);
 	bmp_facebook = wxBitmap(workingDir + wxT("\\Resources\\facebook.png"), wxBITMAP_TYPE_PNG);
 	bmp_twitter = wxBitmap(workingDir + wxT("\\Resources\\twitter.png"), wxBITMAP_TYPE_PNG);
-	bmp_google = wxBitmap(workingDir + wxT("\\Resources\\google.png"), wxBITMAP_TYPE_PNG);
+	//bmp_google = wxBitmap(workingDir + wxT("\\Resources\\utube.png"), wxBITMAP_TYPE_PNG);
+	bmp_instagram = wxBitmap(workingDir + wxT("\\Resources\\instalogo.png"), wxBITMAP_TYPE_PNG);
 
 	Button_FACEBOOK = new wxBitmapButton(Panel_FTG, ID_BUTTON_FACEBOOK, bmp_facebook, wxDefaultPosition, wxSize(22, 22), EGAV_BUTTON_STYLE_NOBORDER);
 	Button_TWITTER = new wxBitmapButton(Panel_FTG, ID_BUTTON_TWITTER, bmp_twitter, wxDefaultPosition, wxSize(22, 22), EGAV_BUTTON_STYLE_NOBORDER);
-	Button_GOOGLE = new wxBitmapButton(Panel_FTG, ID_BUTTON_GOOGLE, bmp_google, wxDefaultPosition, wxSize(22, 22), EGAV_BUTTON_STYLE_NOBORDER);
+	//Button_GOOGLE = new wxBitmapButton(Panel_FTG, ID_BUTTON_GOOGLE, bmp_google, wxDefaultPosition, wxSize(22, 22), EGAV_BUTTON_STYLE_NOBORDER);
+	Button_INSTAGRAM = new wxBitmapButton(Panel_FTG, ID_BUTTON_INSTAGRAM, bmp_instagram, wxDefaultPosition, wxSize(22, 22), EGAV_BUTTON_STYLE_NOBORDER);
+
 
 	Button_FACEBOOK->SetCursor(wxCursor(wxCURSOR_HAND));
 	Button_TWITTER->SetCursor(wxCursor(wxCURSOR_HAND));
-	Button_GOOGLE->SetCursor(wxCursor(wxCURSOR_HAND));
+	//Button_GOOGLE->SetCursor(wxCursor(wxCURSOR_HAND));
+	Button_INSTAGRAM->SetCursor(wxCursor(wxCURSOR_HAND));
+
 	Button_FACEBOOK->SetBackgroundColour(EGAV_WINDOW_BACK_COLOR1);
 	Button_TWITTER->SetBackgroundColour(EGAV_WINDOW_BACK_COLOR1);
-	Button_GOOGLE->SetBackgroundColour(EGAV_WINDOW_BACK_COLOR1);
+	//Button_GOOGLE->SetBackgroundColour(EGAV_WINDOW_BACK_COLOR1);
+	Button_INSTAGRAM->SetBackgroundColour(EGAV_WINDOW_BACK_COLOR1);
 
 	SizerH_FTDPanel = new wxBoxSizer(wxHORIZONTAL);
 	SizerH_FTDPanel->Add(Button_FACEBOOK, 1, 0, 30);
 	SizerH_FTDPanel->AddSpacer(5);
 	SizerH_FTDPanel->Add(Button_TWITTER, 1, 0, 30);
 	SizerH_FTDPanel->AddSpacer(5);
-	SizerH_FTDPanel->Add(Button_GOOGLE, 1, 0, 30);
+	//SizerH_FTDPanel->Add(Button_GOOGLE, 1, 0, 30);
+	SizerH_FTDPanel->Add(Button_INSTAGRAM, 1, 0, 30);
 	SizerH_FTDPanel->AddSpacer(5);
 	Panel_FTG->SetSizer(SizerH_FTDPanel);
 	//////////////////////////////////////////////////
@@ -261,6 +272,7 @@ void AVHomeWindow::OnBtnHelp(wxCommandEvent& WXUNUSED(btnEvent))
 	HelpDoc* help = new HelpDoc(EGAV_ADMIN_PANEL_TITLE wxT(" Help"), workingDir + wxT("\\Docs\\EG Anti Virus 2017.chm"));
 	help->Show();
 	*/
+	
 	ExecuteCHMDoc();
 }
 
@@ -318,5 +330,11 @@ void AVHomeWindow::OnBunttonTwitter(wxCommandEvent& event)
 
 void AVHomeWindow::OnBunttonGoogle(wxCommandEvent& event)
 {
-	wxLaunchDefaultBrowser(wxT("https://plus.google.com/116366892180148580553"), wxBROWSER_NOBUSYCURSOR);
+	wxLaunchDefaultBrowser(wxT("https://www.youtube.com/channel/UCozNmrss2AVE7naw4neqHGg"), wxBROWSER_NOBUSYCURSOR);
 }
+
+void AVHomeWindow::OnBunttonInstagram(wxCommandEvent& event)
+{
+	wxLaunchDefaultBrowser(wxT("https://www.instagram.com/egsoftweb/"), wxBROWSER_NOBUSYCURSOR);
+}
+

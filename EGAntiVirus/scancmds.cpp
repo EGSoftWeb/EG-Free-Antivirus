@@ -129,9 +129,21 @@ void GetScanCmd(wxString& strOut)
 	GetInExCludeStrFromDB(InExCludeStrFromDB);
 	GetMaxInfoStrFromDB(MaxInfoStrFromDB);
 
+
 	strOut = ScannerExeName + wxT(" -v -a -i --bell --recursive=yes ")
 		+ RemoveOrQuarantineStr + wxT(" ") + InExCludeStrFromDB + MaxInfoStrFromDB;
 }
+
+void GetFastScanCmd(wxString& strOut)
+{
+	wxString RemoveOrQuarantineStr;
+	wxString InExCludeStrFromDB;
+	wxString MaxInfoStrFromDB;
+	GetRemoveOrQuarantineStr(RemoveOrQuarantineStr);
+
+	strOut = wxString("clamdscan.exe") + wxString(" -v -i ") + RemoveOrQuarantineStr + wxString(" ");
+}
+
 
 void GetFullScanCmd(wxString& strOut)
 {

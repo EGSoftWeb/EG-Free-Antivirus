@@ -30,6 +30,7 @@ void MakeDefaultIncludeListFile(const wxString& dbFileFullPath);
 //6. SpinCtrl4   ->  1-10				10					Do Not Extract More Than (Sub Archives)
 //7. CheckBox4   ->  TRUE / FALSE		TRUE				Real-Time Protection On/Off
 //8. CheckBox3   ->  TRUE / FALSE		TRUE				Automatic Updates On/Off
+//9. CheckBox5   ->  TRUE / FALSE       TRUE				Do Not Reload VSDB (Fast Scan)
 
 //dbFile2
 // Exclude list of file extension 

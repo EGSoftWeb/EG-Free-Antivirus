@@ -34,6 +34,7 @@ void MakeDefaultAVDBIfNotExist()
 		tempstdstr.clear();
 		tempfile->AddLine(AVDB_TR);
 		tempfile->AddLine(AVDB_TR);
+		tempfile->AddLine(AVDB_TR);
 		tempfile->Write();
 		tempfile->Close();
 		DELETE_POINTER_WXTEXTFILE(tempfile);

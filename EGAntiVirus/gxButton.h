@@ -100,8 +100,9 @@ public:
 		wxMemoryDC dc;
 		dc.SelectObject(bitmap);
 		dc.SetBackground(EGAV_WINDOW_BACK_COLOR1);
-		dc.SetBrush(EGAV_BUTTON_BACK_COLOR2);
+		dc.SetBrush(EGAV_WINDOW_BACK_COLOR1);
 		dc.Clear();
+		dc.SetPen(wxPen(wxColor(100, 100, 100)));
 		dc.DrawRoundedRectangle(0, 0, size.x, size.y, 5);
 		dc.SetTextForeground(EGAV_BUTTON_BACK_COLOR1);
 		if (size == EGAV_BUTTON_SIZE_SMALL)

@@ -3,7 +3,7 @@
 
 
 ViewVirusDetail::ViewVirusDetail(const wxString & title, const wxString & filefullpath, const wxString& heading1, const wxString& heading2)
-	: wxDialog(NULL, -1, title, wxDefaultPosition, wxSize(450, 320), EGAV_DIALOG_BORDER_STYLE)
+	: wxDialog(NULL, -1, title, wxDefaultPosition, wxSize(480, 320), EGAV_DIALOG_BORDER_STYLE)
 {
 	Connect(ID_VIRUS_DETAILS_BTN_EXIT, wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(ViewVirusDetail::OnBtnExit));
 
@@ -47,7 +47,7 @@ ViewVirusDetail::ViewVirusDetail(const wxString & title, const wxString & filefu
 
 void ViewVirusDetail::OnBtnExit(wxCommandEvent& event)
 {
-	Close(true);
+	Close();
 	Destroy();
 }
 

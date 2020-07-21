@@ -5,16 +5,16 @@
 #include <windows.h>      
 #include <intrin.h>       
 #include <iphlpapi.h>  
+#include <cstdint>
 #include <string.h>
 #include <iostream>
+#include <vector>
 
 #pragma comment(lib, "iphlpapi.lib")
 
-typedef unsigned short     uint16_t;
-typedef unsigned int       uint32_t;
+typedef std::uint16_t u16;
+typedef std::uint32_t u32;
 
-typedef uint16_t u16;
-typedef uint32_t u32;
 
 u16 hashMacAddress(PIP_ADAPTER_INFO info);
 void getMacHash(u16& mac1, u16& mac2);
@@ -29,4 +29,5 @@ bool ValidateUID(std::string testIdString);
 DWORD GetPhysicalDriveSerialNumber(std::string& strSerialNumber, UINT nDriveNumber = 0);
 void getMacAddress(std::string& adapinfo);
 void getUniqueId(std::string& uniqid);
+
 #endif

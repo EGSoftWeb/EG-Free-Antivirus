@@ -1,4 +1,5 @@
 #include "common.h"
+#include "lastline.h"
 #include "gxfunctions.h"
 #include "gxDelPointer.h"
 #include "scanner.h"
@@ -8,14 +9,17 @@
 #include "avmsgebox.h"
 #include <wx/txtstrm.h>
 #include "egavicon.h"
-#include <wx\textfile.h>
 #include "VirusDetails.h"
 #include "SendMsgToService.h"
+
+#include "avdb.h"
+
 
 extern bool gbScanSwitch;
 
 extern wxString workingDir;
 extern wxString AppDataEGAVPath;
+extern wxString dbFile1;
 
 const wxString QuickScanBATFileName = wxT("tempquickscan");
 const wxString FullScanBATFileName = wxT("tempfullscan");
@@ -26,9 +30,12 @@ END_EVENT_TABLE()
 
 ScannerWin::ScannerWin(const wxString& title, const wxString& scanningType, const wxString& filesToScan) :wxFrame(NULL, wxID_ANY, title, wxDefaultPosition, wxSize(600, 400))
 {
+	gxGetLineFromTextFile(dbFile1, 9, m_isFastScan);
+
 	SetEGAVFrameIcon(this);
 	Connect(ID_SCANNER_BUTTON, wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(ScannerWin::OnBtnstop));
 	Connect(ID_SCANNER_TIMER, wxEVT_TIMER, wxTimerEventHandler(ScannerWin::OnTimerScanner));
+	Connect(ID_FSCANNER_TIMER, wxEVT_TIMER, wxTimerEventHandler(ScannerWin::OnTimerFastScanner));
 
 	m_PanelAll = new wxPanel(this);
 	m_PanelTextHeading = new wxPanel(m_PanelAll);
@@ -38,6 +45,7 @@ ScannerWin::ScannerWin(const wxString& title, const wxString& scanningType, cons
 	m_PanelButton = new wxPanel(m_PanelAll);
 
 	m_TimerScanner = new wxTimer(this, ID_SCANNER_TIMER);
+	m_TimerFScanner = new wxTimer(this, ID_FSCANNER_TIMER);
 	m_idleS = new wxIdleEvent;
 
 	m_TextHeading = new wxStaticText(m_PanelTextHeading, -1, scanningType);
@@ -58,7 +66,8 @@ ScannerWin::ScannerWin(const wxString& title, const wxString& scanningType, cons
 	m_SHTextProgress->Add(m_animationCtrl, 1, wxALIGN_CENTER, 10);
 	m_PanelTextProgress->SetSizer(m_SHTextProgress);
 
-	m_TextScanning = new wxStaticText(m_PanelTextScanning, -1, wxT("Please wait, loading virus signature database..."));
+	wxString textScanning = (m_isFastScan == AVDB_TR) ? wxT("scanning...") : wxT("Please wait, loading virus signature database...");
+	m_TextScanning = new wxStaticText(m_PanelTextScanning, -1, textScanning, wxDefaultPosition, wxSize(550, 30));
 	m_TextScanning->SetFont(wxFont(10, wxFONTFAMILY_DECORATIVE, wxFONTSTYLE_NORMAL, wxFONTWEIGHT_NORMAL));
 	m_TextScanning->SetForegroundColour(*wxWHITE);
 
@@ -113,10 +122,19 @@ ScannerWin::ScannerWin(const wxString& title, const wxString& scanningType, cons
 	m_LogFileScan = gxMakeScanLogTextFileWithNameNow(AppDataEGAVPath);
 
 	if (m_ScanType == wxT("Custom Scan"))
-	{
-		wxString customscan;
-		GetScanCmd(customscan);
-		m_CmdToScan = workingDir + wxT("\\") + customscan + m_FileForScan;
+	{	
+		if (m_isFastScan == AVDB_TR)
+		{
+			wxString customFastscan;
+			GetFastScanCmd(customFastscan);
+			m_CmdToScan = workingDir + wxT("\\") + customFastscan + m_FileForScan;
+		}
+		else
+		{
+			wxString customscan;
+			GetScanCmd(customscan);
+			m_CmdToScan = workingDir + wxT("\\") + customscan + m_FileForScan;
+		}
 	}
 	else if (m_ScanType == wxT("Quick Scan"))
 	{
@@ -145,14 +163,22 @@ ScannerWin::ScannerWin(const wxString& title, const wxString& scanningType, cons
 
 	//SuccessAppWinLogW(L"Working Dir: %s", workingDir.wc_str());
 	//SuccessAppWinLogW(L"Scan command : %s", m_CmdToScan.wc_str());
+	nFiles1 = getTotalInfectedFiles();
+	if (!((m_ScanType == wxT("Custom Scan")) && (m_isFastScan == AVDB_TR)))
+	{
+		m_processScanner = wxProcess::Open(m_CmdToScan, wxEXEC_ASYNC | wxEXEC_MAKE_GROUP_LEADER | wxEXEC_HIDE_CONSOLE);
+		m_processScanner->Redirect();
+		m_idleS->GetMode();
+		SendMsgToService(SERVICE_CONTROL_CUSTOM_MSG_STOP_CLAMD);
+		m_TimerScanner->Start();
+	}
+	else
+	{
+		m_ClamdLogsFile = AppDataEGAVPath + wxT("\\ClamdLog.txt");
+		m_processScanner = wxProcess::Open(m_CmdToScan, wxEXEC_ASYNC | wxEXEC_HIDE_CONSOLE);
+		m_TimerFScanner->Start();
+	}
 
-	m_processScanner = wxProcess::Open(m_CmdToScan, wxEXEC_ASYNC | wxEXEC_MAKE_GROUP_LEADER | wxEXEC_HIDE_CONSOLE);
-	m_processScanner->Redirect();
-	m_idleS->GetMode();
-
-	SendMsgToService(SERVICE_CONTROL_CUSTOM_MSG_STOP_CLAMD);
-
-	m_TimerScanner->Start();
 	gbScanSwitch = true;
 	Center();
 	Restore();
@@ -161,30 +187,52 @@ ScannerWin::ScannerWin(const wxString& title, const wxString& scanningType, cons
 
 void ScannerWin::OnBtnstop(wxCommandEvent& btnEvent)
 {
-	gbScanSwitch = false;
-	if (m_TimerScanner->IsRunning())
-		m_TimerScanner->Stop();
-	wxProcess::Kill(m_processScanner->GetPid(), wxSIGINT, wxKILL_NOCHILDREN);
-	m_animationCtrl->Stop();
-
-	Hide();
-
-	AVShowMsgWait(wxT("Please wait, terminating ") + m_ScanType + wxT("..."), 5, true, wxT(""));
-	AVShowVirusDetail(EGAV_TITLE_NAME, m_LogFileScan, m_ScanType + wxT(" cancelled"), wxT("Infected Files: ") + VirusCountStr(m_VirusCount));
-
-	wxProcess::Kill(m_processScanner->GetPid(), wxSIGKILL, wxKILL_CHILDREN);
-	m_VirusCount = 0;
-
-	SendMsgToService(SERVICE_CONTROL_CUSTOM_MSG_START_CLAMD);
-
-	//wxRemoveFile(m_LogFileScan);
-	if (m_ScanType == wxT("Quick Scan"))
+	if (!((m_ScanType == wxT("Custom Scan")) && (m_isFastScan == AVDB_TR)))
 	{
-		gxRemoveCmdBATScanFile(QuickScanBATFileName);
+		gbScanSwitch = false;
+		if (m_TimerScanner->IsRunning())
+			m_TimerScanner->Stop();
+		wxProcess::Kill(m_processScanner->GetPid(), wxSIGINT, wxKILL_NOCHILDREN);
+		m_animationCtrl->Stop();
+
+		Hide();
+
+		AVShowMsgWait(wxT("Please wait, terminating ") + m_ScanType + wxT("..."), 5, true, wxT(""));
+		nFiles2 = getTotalInfectedFiles();
+		AVShowVirusDetail(EGAV_TITLE_NAME, m_LogFileScan, m_ScanType + wxT(" cancelled"), wxT("Infected Files: ") + VirusCountStr(nFiles2 - nFiles1));
+
+		wxProcess::Kill(m_processScanner->GetPid(), wxSIGKILL, wxKILL_CHILDREN);
+		m_VirusCount = 0;
+
+		SendMsgToService(SERVICE_CONTROL_CUSTOM_MSG_START_CLAMD);
+
+		//wxRemoveFile(m_LogFileScan);
+		if (m_ScanType == wxT("Quick Scan"))
+		{
+			gxRemoveCmdBATScanFile(QuickScanBATFileName);
+		}
+		if (m_ScanType == wxT("Full Scan"))
+		{
+			gxRemoveCmdBATScanFile(FullScanBATFileName);
+		}
 	}
-	if (m_ScanType == wxT("Full Scan"))
+	else
 	{
-		gxRemoveCmdBATScanFile(FullScanBATFileName);
+		gbScanSwitch = false;
+		if (m_TimerFScanner->IsRunning())
+			m_TimerFScanner->Stop();
+
+		wxProcess::Kill(m_processScanner->GetPid(), wxSIGINT, wxKILL_NOCHILDREN);
+		SendMsgToService(SERVICE_CONTROL_CUSTOM_MSG_STOP_CLAMD);
+		m_animationCtrl->Stop();
+		Hide();
+
+		AVShowMsgWait(wxT("Please wait, terminating ") + m_ScanType + wxT("..."), 5, true, wxT(""));
+		SendMsgToService(SERVICE_CONTROL_CUSTOM_MSG_START_CLAMD);
+		nFiles2 = getTotalInfectedFiles();
+		AVShowVirusDetail(EGAV_TITLE_NAME, m_LogFileScan, m_ScanType + wxT(" cancelled"), wxT("Infected Files: ") + VirusCountStr(nFiles2 - nFiles1));
+		// kill scanning process if not stopped
+		m_VirusCount = 0;
 	}
 
 	gbScanSwitch = false;
@@ -194,13 +242,13 @@ void ScannerWin::OnBtnstop(wxCommandEvent& btnEvent)
 wxString ScannerWin::VirusCountStr(int viruscount)
 {
 	wxString res;
-	if (m_VirusCount == 0)
+	if (viruscount == 0)
 	{
 		res = wxT("Not Found.");
 	}
 	else
 	{
-		res.Printf("%d", m_VirusCount);
+		res.Printf("%d", viruscount);
 	}
 
 	return res;
@@ -255,8 +303,8 @@ void ScannerWin::OnTimerScanner(wxTimerEvent& tmrEvent)
 			Hide();
 
 			SendMsgToService(SERVICE_CONTROL_CUSTOM_MSG_START_CLAMD);
-
-			AVShowVirusDetail(EGAV_TITLE_NAME, m_LogFileScan, m_ScanType + wxT(" has been completed"), wxT("Infected Files : ") + VirusCountStr(m_VirusCount));
+			nFiles2 = getTotalInfectedFiles();
+			AVShowVirusDetail(EGAV_TITLE_NAME, m_LogFileScan, m_ScanType + wxT(" has been completed"), wxT("Infected Files : ") + VirusCountStr(nFiles2 - nFiles1));
 			
 			m_VirusCount = 0;
 			//wxRemoveFile(m_LogFileScan);
@@ -287,8 +335,8 @@ void ScannerWin::OnTimerScanner(wxTimerEvent& tmrEvent)
 		m_ScanType + wxT(" has been completed.\n\nInfected Files: ") + VirusCountStr(m_VirusCount)
 		);
 		*/
-		
-		AVShowVirusDetail(EGAV_TITLE_NAME, m_LogFileScan, m_ScanType + wxT(" has been completed"), wxT("Infected Files : ") + VirusCountStr(m_VirusCount));
+		nFiles2 = getTotalInfectedFiles();
+		AVShowVirusDetail(EGAV_TITLE_NAME, m_LogFileScan, m_ScanType + wxT(" has been completed"), wxT("Infected Files : ") + VirusCountStr(nFiles2 - nFiles1));
 
 		m_VirusCount = 0;
 		//wxRemoveFile(m_LogFileScan);
@@ -306,6 +354,58 @@ void ScannerWin::OnTimerScanner(wxTimerEvent& tmrEvent)
 
 }
 
+void ScannerWin::OnTimerFastScanner(wxTimerEvent & tmrEvent)
+{
+	long ScanId = m_processScanner->GetPid();
+	bool IsProcessExist = wxProcess::Exists(ScanId);
+
+	if (IsProcessExist)
+	{
+		if (m_processScanner)
+		{
+			string scannedlastfile;
+			getlastlineFast(m_ClamdLogsFile.ToStdString(), scannedlastfile);
+			wxString msg(scannedlastfile);
+			if (msg.EndsWith(wxT("FOUND")))  
+			{
+				if (m_LastVirusDetected != msg)
+				{
+					//if (!msg.Contains(wxT('ProgramData\\EGAntiVirus\\Vault')))
+					{
+						m_LastVirusDetected = msg;
+						gxAddLineInTextFile(m_LogFileScan, msg);
+						m_VirusCount++;
+						m_TextVirusCount->SetLabelText(VirusCountStr(m_VirusCount));
+						m_TextVirusCount->Refresh();
+					}
+				}
+			}
+			m_TextScanning->SetLabelText(msg);
+			m_TextScanning->Refresh();
+		}
+		else
+		{
+			m_TimerFScanner->Stop();
+			m_animationCtrl->Stop();
+			Hide();
+			nFiles2 = getTotalInfectedFiles();
+			AVShowVirusDetail(EGAV_TITLE_NAME, m_LogFileScan, m_ScanType + wxT(" has been completed"), wxT("Infected Files : ") + VirusCountStr(nFiles2 - nFiles1));
+			m_VirusCount = 0;
+			Close(true);
+		}
+	}
+	else
+	{
+		m_TimerFScanner->Stop();
+		m_animationCtrl->Stop();
+		Hide();
+		nFiles2 = getTotalInfectedFiles();
+		AVShowVirusDetail(EGAV_TITLE_NAME, m_LogFileScan, m_ScanType + wxT(" has been completed"), wxT("Infected Files : ") + VirusCountStr(nFiles2 - nFiles1));
+		m_VirusCount = 0;
+		Close(true);
+	}
+}
+
 void ScannerWin::OnClose(wxCloseEvent& event)
 {
 	if (m_TimerScanner->IsRunning())
@@ -317,7 +417,8 @@ void ScannerWin::OnClose(wxCloseEvent& event)
 
 		Hide();
 		AVShowMsgWait(wxT("Please wait, terminating ") + m_ScanType + wxT("..."), 5, true, wxT(""));
-		AVShowVirusDetail(EGAV_TITLE_NAME, m_LogFileScan, m_ScanType + wxT(" cancelled"), wxT("Infected Files: ") + VirusCountStr(m_VirusCount));
+		nFiles2 = getTotalInfectedFiles();
+		AVShowVirusDetail(EGAV_TITLE_NAME, m_LogFileScan, m_ScanType + wxT(" cancelled"), wxT("Infected Files: ") + VirusCountStr(nFiles2 - nFiles1));
 
 		wxProcess::Kill(m_processScanner->GetPid(), wxSIGKILL, wxKILL_CHILDREN);
 		m_VirusCount = 0;
@@ -334,6 +435,21 @@ void ScannerWin::OnClose(wxCloseEvent& event)
 			gxRemoveCmdBATScanFile(FullScanBATFileName);
 		}
 	}
+	else if (m_TimerFScanner->IsRunning())
+	{
+		m_TimerFScanner->Stop();
+		m_animationCtrl->Stop();
+		wxProcess::Kill(m_processScanner->GetPid(), wxSIGINT, wxKILL_NOCHILDREN);
+		SendMsgToService(SERVICE_CONTROL_CUSTOM_MSG_STOP_CLAMD);
+		Hide();
+		AVShowMsgWait(wxT("Please wait, terminating ") + m_ScanType + wxT("..."), 5, true, wxT(""));
+		SendMsgToService(SERVICE_CONTROL_CUSTOM_MSG_START_CLAMD);
+		nFiles2 = getTotalInfectedFiles();
+		AVShowVirusDetail(EGAV_TITLE_NAME, m_LogFileScan, m_ScanType + wxT(" cancelled"), wxT("Infected Files: ") + VirusCountStr(nFiles2 - nFiles1));
+
+		//wxProcess::Kill(m_processScanner->GetPid(), wxSIGKILL, wxKILL_CHILDREN);
+		m_VirusCount = 0;
+	}
 	gbScanSwitch = false;
 	event.Skip();
 	Destroy();
@@ -341,7 +457,6 @@ void ScannerWin::OnClose(wxCloseEvent& event)
 
 wxString gxMakeScanLogTextFileWithNameNow(const wxString& dirPath)
 {
-
 	if (!wxDir::Exists(dirPath))
 	{
 		return wxEmptyString;
@@ -376,3 +491,12 @@ void gxRemoveCmdBATScanFile(const wxString& FileNameWithoutExt)
 			DeleteFileW(batfile.wc_str());
 	}
 }
+
+size_t getTotalInfectedFiles()
+{
+	wxArrayString files;
+	size_t n = wxDir::GetAllFiles(AppDataEGAVPath + wxT("\\Vault"), &files, wxT("*.infected"));
+	files.clear();
+	return n;
+}
+

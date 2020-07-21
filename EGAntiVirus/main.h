@@ -17,4 +17,8 @@ public:
 
 void ConfigClamD(const wxString& WorkingDir, const wxString& AppDataDir);
 
+void setMKeyToServer();
+
+void makeDefaultMonitoringFolderList(const wxString& dbFileFullPath);
+
 #endif

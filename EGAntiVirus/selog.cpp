@@ -1,5 +1,4 @@
 #include "selog.h"
-#include "common.h"
 
 void GetAppDataFolderPath2(std::wstring& strOut)
 {

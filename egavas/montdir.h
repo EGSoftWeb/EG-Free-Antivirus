@@ -45,5 +45,6 @@ wxThread *CreateThreadMonitorDir2();
 
 void DeleteThreadMonitorDir2();
 
+bool shouldMonitor(const wxString& filepath);
 /////////////////////////////////////////////////////////////////////
 #endif

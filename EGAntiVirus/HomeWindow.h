@@ -21,10 +21,10 @@ public:
 	void OnCollapseDirCtrl(wxTreeEvent& event);
 	void OnTimerHome(wxTimerEvent& event);
 
-	wxClickText* m_avClogo;                  	//Heading Image EG logo
+	wxClickText* m_avClogo;                  					//Heading Image EG logo
 	wxClickText* m_avQuarantineText;
-	wxStaticText* m_avHeadingText;          	   // Heading "Anti Virus"
-	wxGenericDirCtrl* m_avDirCtrl;            	// Dir/File Selection Window
+	wxStaticText *m_avHeadingText1, *m_avHeadingText2;  	    // Heading "Anti Virus"
+	wxGenericDirCtrl* m_avDirCtrl;            					// Dir/File Selection Window
 	wxStaticText* dirCtrlTxt0;
 	wxStaticText* dirCtrlTxt1;
 
@@ -61,12 +61,13 @@ public:
 	
 	/////////////////////////////////////////////////////////////////////
 	wxPanel* Panel_FTG;
-	wxBitmap bmp_facebook, bmp_twitter, bmp_google;
-	wxBitmapButton *Button_FACEBOOK, *Button_TWITTER, *Button_GOOGLE;
+	wxBitmap bmp_facebook, bmp_twitter, bmp_google, bmp_instagram;
+	wxBitmapButton *Button_FACEBOOK, *Button_TWITTER, *Button_GOOGLE, *Button_INSTAGRAM;
 	wxBoxSizer *SizerH_FTDPanel;
 	void OnBunttonFacebook(wxCommandEvent& event);
 	void OnBunttonTwitter(wxCommandEvent& event);
 	void OnBunttonGoogle(wxCommandEvent& event);
+	void OnBunttonInstagram(wxCommandEvent& event);
 	/////////////////////////////////////////////////////////////////////
 
 	//Timer
@@ -91,5 +92,6 @@ enum eBTN_ID1
 	ID_BUTTON_FACEBOOK,
 	ID_BUTTON_TWITTER,
 	ID_BUTTON_GOOGLE,
+	ID_BUTTON_INSTAGRAM,
 };
 #endif

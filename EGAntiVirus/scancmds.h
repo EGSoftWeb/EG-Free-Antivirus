@@ -9,6 +9,7 @@ void GetMaxInfoStrFromDB(wxString& strOut);
 void GetQuickScanIncludeOption(wxString& strOut);
 void GetQuickScanMaxInfoOption(wxString& strOut);
 void GetScanCmd(wxString& strOut);
+void GetFastScanCmd(wxString& strOut);
 void GetFullScanCmd(wxString& strOut);
 void GetQuickScanCmd(wxString& strOut);
 void GetMemoryScanCmd(wxString& strOut);

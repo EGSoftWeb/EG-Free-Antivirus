@@ -217,7 +217,7 @@ void HomeTrayWin::OnMenuUpdateSoftware(wxCommandEvent& event)
 	else
 	{
 		wxString urlstr = wxT("http://www.egsoftweb.in/OurProduct_Readmore.aspx?id=6");
-		wxLaunchDefaultBrowser(urlstr);
+		wxLaunchDefaultBrowser(urlstr, wxBROWSER_NOBUSYCURSOR);
 	}
 }
 
@@ -253,7 +253,7 @@ void HomeTrayWin::SetUpdateStatus(const wxString& Status, BOOL bUpdate)
 
 void HomeTrayWin::OnMenuDocHelp(wxCommandEvent& event)
 {
-	wxLaunchDefaultBrowser(wxT("http://www.egsoftweb.in/OurProduct_Readmore.aspx?id=6"));
+	wxLaunchDefaultBrowser(wxT("http://www.egsoftweb.in/OurProduct_Readmore.aspx?id=6"), wxBROWSER_NOBUSYCURSOR);
 }
 
 void HomeTrayWin::OnMenuAnyFeedback(wxCommandEvent& event)
@@ -383,7 +383,7 @@ void MyTaskBarIcon::OnMenuDownloadUpdates(wxCommandEvent&)
 	else
 	{
 		wxString urlstr = wxT("http://www.egsoftweb.in/OurProduct_Readmore.aspx?id=6");
-		wxLaunchDefaultBrowser(urlstr);
+		wxLaunchDefaultBrowser(urlstr, wxBROWSER_NOBUSYCURSOR);
 		//check is software updated
 		//check is virus defination updated
 		//if no
