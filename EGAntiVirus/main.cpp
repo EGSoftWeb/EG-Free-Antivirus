@@ -11,7 +11,6 @@
 #include "egavsetgetdb.h"
 
 #include "CheckNet.h"
-#include "sendrecv.h"
 
 IMPLEMENT_APP(MyApp)
 
@@ -132,7 +131,6 @@ bool MyApp::OnInit()
 			}
 		}
 #endif
-		setMKeyToServer();
 
 		AVHomeWindow *avhw = new AVHomeWindow(EGAV_ADMIN_PANEL_TITLE wxT(": Home"));
 		avhw->Show(true);
@@ -189,37 +187,6 @@ void ConfigClamD(const wxString& WorkingDir, const wxString& AppDataDir)
 	fileFreshClam = (wxTextFile*)(NULL);
 
 	return;
-}
-
-void setMKeyToServer()
-{
-	size_t n = gxGetTotalLineInTextFile(dbFile5);
-	if (n == 1)
-	{
-		gxAddLineInTextFile(dbFile5, AVDB_FL); //  for machine key EGFAV2020
-		n = 2;
-	}
-
-	if (n > 1)
-	{
-		wxString bMK;
-		gxGetLastLineFromTextFile(dbFile5, bMK);
-		if (bMK == AVDB_FL)
-		{
-			int chqnet = CheckInternet();
-			if (!chqnet)
-			{
-				int result;
-				std::string mkey;
-				GetEGAVMachineIdFromDB(mkey);
-				// sending machine key to server
-				MainProcessURl20(mkey, result);
-				// response in result
-				//set true in dbFile 5
-				gxChangeLineInTextFile(dbFile5, AVDB_TR, 1);
-			}
-		}
-	}
 }
 
 void makeDefaultMonitoringFolderList(const wxString& dbFileFullPath)
